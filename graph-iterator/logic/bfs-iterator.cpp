@@ -1,18 +1,18 @@
-#include <vector>
+#include <algorithm>
 
 #include "bfs-iterator.h"
 
 constexpr auto FIRST_VERTEX = 0;
 
 BFSIterator::BFSIterator(Graph graph) {
-	graph = graph;
-	// All verices are initially marked as not visited.
-	std::vector<bool> visited(graph.getNumberOfVertices(), false);
-	queue;
+	known_vertices = std::vector<bool>(graph.getNumberOfVertices(), false);
 }
 
 void BFSIterator::reset() {
-	this->queue.push(FIRST_VERTEX);
+	std::fill(known_vertices.begin(), known_vertices.end(), false);
+	known_vertices[FIRST_VERTEX] = true;
+	queue.empty();
+	queue.push(FIRST_VERTEX); 
 }
 
 void BFSIterator::next() {
@@ -20,18 +20,19 @@ void BFSIterator::next() {
 		int current = queue.front();
 		queue.pop();
 
-		visited[current] = true;
+		std::vector<int> edges{ graph.getEdges(current) };
 
-		auto neighbours = graph.getNeighbours(current);
-		for (auto i = neighbours.begin(); i != neighbours.end(); ++i) {
-			if ( !visited[*i] ) {
-				queue.push(*i);
+		for (int vertex : edges) {
+			if (!known_vertices[vertex]) {
+				queue.push(vertex);
+				known_vertices[vertex] = true;
 			}
 		}
 	} else {
-		for (int i = 0; i < visited.size(); ++i) {
-			if ( !visited[i] ) {
-				queue.push(i);
+		for (int vertex = 0; vertex < known_vertices.size(); ++vertex) {
+			if ( !known_vertices[vertex] ) {
+				queue.push(vertex);
+				known_vertices[vertex] = true;
 				break;
 			}
 		}
@@ -40,4 +41,14 @@ void BFSIterator::next() {
 
 int BFSIterator::currentKey() {
 	return queue.front();
+}
+
+bool BFSIterator::isEnd() {
+	return this->queue.empty() && std::all_of(
+		std::begin(known_vertices),
+		std::end(known_vertices),
+		[](bool i) {
+			return i;
+		}
+	);
 }

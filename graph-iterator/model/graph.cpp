@@ -5,30 +5,32 @@
 
 #include "graph.h"
 
-Graph::Graph(int number_of_vertices) {
-    V = number_of_vertices;
-    adjacency_list = new std::vector<int>[V];
+using namespace std;
+
+Graph::Graph(int n) {
+    number_of_vertices = n;
+    adjacency_matrix = vector<vector<bool>>(n, vector<bool>(n, false));
 }
 
 Graph::Graph(std::string file_name) {
 
-    std::ifstream input_file(file_name);
-    std::string line;
+    ifstream input_file{ file_name };
+    string line;
 
     if ( !getline(input_file, line) ) {
         throw "ERR: Input file empty!";
     }
-    std::istringstream iss(line);
+    istringstream iss(line);
 
-    int number_of_vertices;
-    if ( !(iss >> number_of_vertices) ) {
+    int n;
+    if ( !(iss >> n) ) {
         throw "ERR: Invalid input from file!";
     };
 
-    Graph graph = Graph(number_of_vertices);
+    Graph graph = Graph(n);
 
     while ( getline(input_file, line) ) {
-        std::istringstream iss(line);
+        istringstream iss(line);
 
         int vertex, neighbour;
         if ( !(iss >> vertex >> neighbour) ) {
@@ -38,41 +40,44 @@ Graph::Graph(std::string file_name) {
         graph.addEdge(vertex, neighbour);
     }
 
-    V = number_of_vertices;
-    adjacency_list = new std::vector<int>[V];
-    for (int i = 0; i < V; ++i) {
-        adjacency_list[i] = graph.adjacency_list[i];
-    }
+    number_of_vertices = n;
+    adjacency_matrix = graph.adjacency_matrix;
 }
 
 int Graph::getNumberOfVertices() {
-    return this->V;
+    return number_of_vertices;
 }
 
-std::vector<int> Graph::getNeighbours(int vertex) {
-    return this->adjacency_list[vertex];
+std::vector<int> Graph::getEdges(int vertex) {
+    vector<int> edges;
+    vector<bool> connections{ adjacency_matrix[vertex] };
+
+    for (int i = 0; i < getNumberOfVertices(); ++i) {
+        if ( connections[i] ) {
+            edges.push_back(i);
+        }
+    }
+
+    return edges;
 }
 
-void Graph::addEdge(int u, int w) {
+void Graph::addEdge(int u, int v) {
     
-    if ( u >= V || w >= V ) {
+    if ( u >= number_of_vertices || v >= number_of_vertices) {
         throw "ERR: Invalid vertex!";
     }
 
-    if ( std::find(adjacency_list[u].begin(), adjacency_list[u].end(), w) == adjacency_list[u].end() ) {
-        adjacency_list[u].push_back(w);
-        adjacency_list[w].push_back(u);
-    } else {
-        throw "ERR: Vertex already exists!";
-    }
+    this->adjacency_matrix[u][v] = true;
+    this->adjacency_matrix[v][u] = true;
 }
 
-void Graph::printGraph() {
-    for (int i = 0; i < V; ++i) {
-        std::cout << "Adjacency list of vertex n=" << i << ": ";
-
-        for (int j = 0; j < adjacency_list[i].size(); ++j) {
-            std::cout << adjacency_list[i].at(j) << (j == adjacency_list[i].size() - 1 ? "\n" : " -> ");
+void Graph::printAdjacencyMatrix() {
+    for (int i = 0; i < number_of_vertices; i++)
+    {
+        for (int j = 0; j < number_of_vertices; j++)
+        {
+            cout << adjacency_matrix[i][j] << " ";
         }
+        cout << std::endl;
     }
 }

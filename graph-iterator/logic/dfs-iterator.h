@@ -11,6 +11,14 @@ private:
     Graph graph;
 
     /**
+     * A collection representing all graph's vertices.
+     *
+     * Boolean value at the i-th position corresponds to whether has the i-th vertex been discovered.
+     * All verices are initially marked as uknown.
+     */
+    std::vector<bool> known_vertices;
+
+    /**
      * Stack used by depth-first search algorithm.
      *
      * At the top of the stack, there is a currently proccesed vertex.
@@ -21,7 +29,7 @@ private:
 public:
 
     /** Constructs DFS iterator for given graph. */
-    DFSIterator(Graph graph = Graph(0));
+    DFSIterator(Graph graph);
 
     /** Prepares an interation by placing vertex with the lowest int value onto the stack. */
     void reset();
@@ -35,12 +43,9 @@ public:
      */
     void next();
 
-    /** Returns true if all verticis have been visited. */
-    bool isEnd();
-
     /** Returns int value of currently processed vertex. */
     int currentKey();
 
-    /** Iterate through the entire graph. */
-    void iterate();
+    /** Returns true if all verticis have been visited. */
+    bool isEnd();
 };

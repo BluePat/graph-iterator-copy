@@ -1,18 +1,19 @@
-#include <vector>
+#include <algorithm>
+#include <iostream>
 
 #include "dfs-iterator.h"
 
 constexpr auto FIRST_VERTEX = 0;
 
 DFSIterator::DFSIterator(Graph graph) {
-	graph = graph;
-	// All verices are initially marked as not visited.
-	std::vector<bool> visited(graph.getNumberOfVertices(), false);
-	stack;
+	known_vertices = std::vector<bool>(graph.getNumberOfVertices(), false);
 }
 
 void DFSIterator::reset() {
-	this->stack.push(FIRST_VERTEX);
+	std::fill(known_vertices.begin(), known_vertices.end(), false);
+	known_vertices[FIRST_VERTEX] = true;
+	stack.empty();
+	stack.push(FIRST_VERTEX);
 }
 
 void DFSIterator::next() {
@@ -20,18 +21,19 @@ void DFSIterator::next() {
 		int current = stack.top();
 		stack.pop();
 
-		visited[current] = true;
+		std::vector<int> edges{ graph.getEdges(current) };
 
-		auto neighbours = graph.getNeighbours(current);
-		for (auto i = neighbours.begin(); i != neighbours.end(); ++i) {
-			if ( !visited[*i] ) {
-				stack.push(*i);
+		for (int vertex : edges) {
+			if ( !known_vertices[vertex] ) {
+				known_vertices[vertex] = true;
+				stack.push(vertex);
 			}
 		}
 	} else {
-		for (int i = 0; i < visited.size(); ++i) {
-			if ( !visited[i] ) {
-				stack.push(i);
+		for (int vertex = 0; vertex < known_vertices.size(); ++vertex) {
+			if ( !known_vertices[vertex] ) {
+				known_vertices[vertex] = true;
+				stack.push(vertex);
 				break;
 			}
 		}
@@ -40,4 +42,14 @@ void DFSIterator::next() {
 
 int DFSIterator::currentKey() {
 	return stack.top();
+}
+
+bool DFSIterator::isEnd() {
+	return stack.empty() && std::all_of(
+		std::begin(known_vertices),
+		std::end(known_vertices),
+		[](bool i) {
+			return i;
+		}
+	);
 }

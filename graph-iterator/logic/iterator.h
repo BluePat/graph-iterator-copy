@@ -1,21 +1,12 @@
+#ifndef ITERATOR_H
+#define ITERATOR_H
+
 #include <vector>
 
 #include "../model/graph.h"
 
 /** Base class used for deriving DFS and BFS iterators. */
 class Iterator {
-
-protected:
-    
-    /** A graph to iterate over. */
-    Graph graph;
-
-    /**
-     * A collection representing all graph's vertices.
-     * 
-     * Boolean value at the i-th position corresponds to whether has the i-th vertex been visited.
-     */
-    std::vector<bool> visited;
 
 public:
 
@@ -29,8 +20,7 @@ public:
     virtual int currentKey() = 0;
 
     /** Returns true if all verticis have been visited. */
-    bool isEnd();
-
-    /** Iterate through the entire graph. */
-    void iterate();
+    virtual bool isEnd() = 0;
 };
+
+#endif

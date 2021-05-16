@@ -2,20 +2,29 @@
 
 #include "logic/bfs-iterator.h"
 #include "logic/dfs-iterator.h"
-#include "logic/iterator.h"
-#include "model/graph.h"
+
+void iterate(DFSIterator iterator) {
+
+	iterator.reset();
+
+	while ( !iterator.isEnd() ) {
+		std::cout << iterator.currentKey() << " ";
+		iterator.next();
+	}
+}
 
 int main(int argc, char* argv[]) {
 
 	try {
-		Graph graph("graph1.txt");
-		graph.printGraph();
+		Graph graph{ "graph1.txt" };
+		graph.printAdjacencyMatrix();
 
-		DFSIterator dfs(graph);
-		dfs.iterate();
+		DFSIterator dfs{ graph };
+		std::cout << "Info: DFSIterator initialized.\n";
+		iterate(dfs);
 
-		BFSIterator bfs(graph);
-		bfs.iterate();
+		BFSIterator bfs{ graph };
+		//iterate(bfs);
 
 	} catch (std::string msg) {
 		std::cout << msg;
